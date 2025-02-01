@@ -31,15 +31,12 @@ public class SecurityConfig {
     private final String[] PUBLIC = {
             "/v1/promotions/**",
             "/v1/promotions-conditions/**",
+            "/swagger-ui.html",
+            "/swagger-ui/**", // Include this alternative path as well
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/webjars/**"
     };
-
-    private static final String[] SWAGGER_PATHS = {
-        "/swagger-ui.html",
-        "/swagger-ui/**", // Include this alternative path as well
-        "/v3/api-docs/**",
-        "/swagger-resources/**",
-        "/webjars/**"
-};
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -66,7 +63,6 @@ public class SecurityConfig {
         }).csrf(AbstractHttpConfigurer::disable).sessionManagement(config -> {
             config.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         }).authorizeHttpRequests(config -> {
-            config.requestMatchers(SWAGGER_PATHS).permitAll();
             config.requestMatchers(PUBLIC).anonymous();
             config.anyRequest().authenticated();
         }).addFilterBefore(new TokenFilter(tokenService), UsernamePasswordAuthenticationFilter.class).build();
