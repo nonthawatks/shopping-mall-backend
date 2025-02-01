@@ -1,6 +1,7 @@
 package com.example.meeboilerplate.service.impl;
 
 import com.example.meeboilerplate.entity.PromotionConditionEntity;
+import com.example.meeboilerplate.entity.PromotionEntity;
 import com.example.meeboilerplate.exception.BaseException;
 import com.example.meeboilerplate.exception.ConditionException;
 import com.example.meeboilerplate.exception.PromotionException;
@@ -8,6 +9,7 @@ import com.example.meeboilerplate.model.conditions.ConditionCreateRequest;
 import com.example.meeboilerplate.model.conditions.ConditionOrderRequest;
 import com.example.meeboilerplate.model.conditions.ConditionUpdateRequest;
 import com.example.meeboilerplate.repository.PromotionConditionRepository;
+import com.example.meeboilerplate.repository.PromotionRepository;
 import com.example.meeboilerplate.service.PromotionConditionService;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +21,11 @@ import java.util.Optional;
 @Service
 public class PromotionConditionServiceImpl implements PromotionConditionService {
     private final PromotionConditionRepository promotionCondRepository;
+    private final PromotionRepository promotionRepository;
 
-    public PromotionConditionServiceImpl(PromotionConditionRepository promotionCondRepository) {
+    public PromotionConditionServiceImpl(PromotionConditionRepository promotionCondRepository, PromotionRepository promotionRepository) {
         this.promotionCondRepository = promotionCondRepository;
+        this.promotionRepository = promotionRepository;
     }
 
     public List<PromotionConditionEntity> search() throws BaseException {
@@ -56,7 +60,10 @@ public class PromotionConditionServiceImpl implements PromotionConditionService 
     public PromotionConditionEntity createCondition(ConditionCreateRequest request) throws BaseException {
         try {
             PromotionConditionEntity condition = new PromotionConditionEntity();
-            condition.setPromotionId(request.getPromotionId());
+            PromotionEntity promotion = promotionRepository.findById(request.getPromotionId())
+                    .orElseThrow(() -> PromotionException.invalidPromotion(request.getPromotionId()));
+
+            condition.setPromotion(promotion);
             condition.setMinValue(request.getMinValue());
             condition.setMaxValue(request.getMaxValue());
             condition.setDiscountType(request.getDiscountType());

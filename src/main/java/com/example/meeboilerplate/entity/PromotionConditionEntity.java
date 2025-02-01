@@ -16,8 +16,6 @@ public class PromotionConditionEntity extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private Long promotionId;
     private BigDecimal minValue;
     private BigDecimal maxValue;
     private String discountType;

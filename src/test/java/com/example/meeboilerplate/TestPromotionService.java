@@ -5,8 +5,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import com.example.meeboilerplate.entity.PromotionEntity; // Import your entity
 import com.example.meeboilerplate.exception.BaseException;
 import com.example.meeboilerplate.model.promotions.PromotionCreateRequest;
