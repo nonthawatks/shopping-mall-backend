@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -175,8 +176,8 @@ public class PromotionServiceImpl implements PromotionService {
         }
 
         try {
-            promotionRepository.saveAll(promotionsToUpdate);
-            return promotionsToUpdate;
+            Iterable<PromotionEntity> updatedPromotions = promotionRepository.saveAll(promotionsToUpdate);
+            return StreamSupport.stream(updatedPromotions.spliterator(), false).collect(Collectors.toList());
         } catch (Exception e) {
             throw new PromotionException(e.getMessage());
         }
