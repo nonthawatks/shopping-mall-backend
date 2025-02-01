@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-public interface PromotionConditionRepository extends CrudRepository<PromotionConditionEntity, Integer> {
+public interface PromotionConditionRepository extends CrudRepository<PromotionConditionEntity, Long> {
    
 
     Optional<PromotionConditionEntity> findById(Long id);

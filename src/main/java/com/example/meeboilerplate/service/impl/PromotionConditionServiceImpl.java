@@ -1,10 +1,12 @@
 package com.example.meeboilerplate.service.impl;
 
 import com.example.meeboilerplate.entity.PromotionConditionEntity;
-import com.example.meeboilerplate.entity.PromotionEntity;
 import com.example.meeboilerplate.exception.BaseException;
+import com.example.meeboilerplate.exception.ConditionException;
 import com.example.meeboilerplate.exception.PromotionException;
-import com.example.meeboilerplate.model.promotions.PromotionOrderRequest;
+import com.example.meeboilerplate.model.conditions.ConditionCreateRequest;
+import com.example.meeboilerplate.model.conditions.ConditionOrderRequest;
+import com.example.meeboilerplate.model.conditions.ConditionUpdateRequest;
 import com.example.meeboilerplate.repository.PromotionConditionRepository;
 import com.example.meeboilerplate.service.PromotionConditionService;
 import org.springframework.stereotype.Service;
@@ -28,15 +30,15 @@ public class PromotionConditionServiceImpl implements PromotionConditionService 
         return promotionConditionsList;
     }
 
-    public List<PromotionConditionEntity> changeConditionsStep(List<PromotionOrderRequest> conditionsUpdates)
+    public List<PromotionConditionEntity> changeConditionsStep(List<ConditionOrderRequest> conditionsUpdates)
             throws BaseException {
         List<PromotionConditionEntity> conditionsToUpdate = new ArrayList<>();
 
-        for (PromotionOrderRequest conditionsUpdate : conditionsUpdates) {
+        for (ConditionOrderRequest conditionsUpdate : conditionsUpdates) {
             Optional<PromotionConditionEntity> conditionOpt = promotionCondRepository
                     .findById(conditionsUpdate.getId());
             PromotionConditionEntity condition = conditionOpt
-                    .orElseThrow(() -> PromotionException.invalidPromotion(conditionsUpdate.getId()));
+                    .orElseThrow(() -> ConditionException.invalidCondition(conditionsUpdate.getId()));
 
             condition.setStep(conditionsUpdate.getStep());
             condition.setUpdatedDate(LocalDateTime.now());
@@ -48,6 +50,54 @@ public class PromotionConditionServiceImpl implements PromotionConditionService 
             return conditionsToUpdate;
         } catch (Exception e) {
             throw new PromotionException(e.getMessage());
+        }
+    }
+
+    public PromotionConditionEntity createCondition(ConditionCreateRequest request) throws BaseException {
+        try {
+            PromotionConditionEntity condition = new PromotionConditionEntity();
+            condition.setPromotionId(request.getPromotionId());
+            condition.setMinValue(request.getMinValue());
+            condition.setMaxValue(request.getMaxValue());
+            condition.setDiscountType(request.getDiscountType());
+            condition.setDiscountValue(request.getDiscountValue());
+            Integer lastStep = promotionCondRepository.findLastStep(request.getPromotionId());
+            Integer nextStep = (lastStep == null ? 0 : lastStep) + 1;
+            condition.setStep(nextStep);
+            return promotionCondRepository.save(condition);
+        } catch (Exception e) {
+            throw new ConditionException(e.getMessage());
+        }
+    }
+
+    public Long deleteCondition(Long id) throws BaseException {
+        try {
+            PromotionConditionEntity condition = promotionCondRepository.findById(id)
+                    .orElseThrow(() -> ConditionException.invalidCondition(id));
+            promotionCondRepository.deleteById(condition.getId());
+            return id;
+        } catch (Exception e) {
+            throw new ConditionException(e.getMessage());
+        }
+    }
+
+    public PromotionConditionEntity updateCondition(Long id, ConditionUpdateRequest request) throws BaseException {
+        try {
+            PromotionConditionEntity condition = promotionCondRepository.findById(id)
+                    .orElseThrow(() -> ConditionException.invalidCondition(id));
+            if (request.getMinValue() != null)
+                condition.setMinValue(request.getMinValue());
+            if (request.getMaxValue() != null)
+                condition.setMaxValue(request.getMaxValue());
+            if (request.getDiscountType() != null)
+                condition.setDiscountType(request.getDiscountType());
+            if (request.getDiscountValue() != null)
+                condition.setDiscountValue(request.getDiscountValue());
+            if (request.getStep() != null)
+                condition.setStep(request.getStep());
+            return promotionCondRepository.save(condition);
+        } catch (Exception e) {
+            throw new ConditionException(e.getMessage());
         }
     }
 }
